@@ -31,6 +31,8 @@ class App extends React.Component {
         // the Manager.create() promise resolves
         let maxTries = 40; // 40 * 250 = 10s
         let triggeredVisibility = false;
+
+        let stillValid = false;
         let loop = setInterval(() =>  {
           if (!maxTries--) {
             clearInterval(loop);
@@ -39,22 +41,39 @@ class App extends React.Component {
 
           console.log('checking loaded');
 
-          if (window.Twilio &&
-                window.Twilio.FlexWebChat &&
-                window.Twilio.FlexWebChat.manager) {
-                    if (window.Twilio.FlexWebChat.manager.chatClient === undefined) {
-                      if (!triggeredVisibility) {
-                        console.log('toggling visibility');
-                        FlexWebChat.Actions.invokeAction('ToggleChatVisibility');
-                        triggeredVisibility = true;
-                      }
-                    } else {
-                      // we seem to be loaded, let's go
-                      clearInterval(loop);
-                      console.log('loaded');
-                      setTimeout(() => resolve(), 500);
-                    }
+          if (FlexWebChat.manager) {
+            console.log('chat client', FlexWebChat.manager.chatClient);
+            if (FlexWebChat.manager.chatClient === undefined) {
+              if (!triggeredVisibility) {
+                console.log('toggling visibility');
+                FlexWebChat.Actions.invokeAction('ToggleChatVisibility');
+                triggeredVisibility = true;
               }
+
+              stillValid = false;
+            } else {
+              if (FlexWebChat.manager.chatClient.connectionState !== 'connecting') {
+                triggeredVisibility = false;
+                stillValid = true;
+                // we seem to be loaded, let's go
+                console.log('loaded');
+                setTimeout(() => {
+                  // We stayed in a happy state for the full validity period
+                  if (stillValid) {
+                    console.log('passed validity period');
+                    clearInterval(loop);
+
+                    if (!FlexWebChat.manager.store.getState().flex.session.isEntryPointExpanded) {
+                      FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
+                    }
+                    resolve();
+                  }  else {
+                    console.log('failed validity period');
+                  }
+                }, 500);
+              }
+            }
+          }
         }, 250);
 
         window.Twilio = window.Twilio || {};
