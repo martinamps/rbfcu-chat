@@ -1,5 +1,6 @@
 import React from 'react';
 import * as FlexWebChat from "@twilio/flex-webchat-ui";
+import ChatBadges from './ChatBadges';
 import ChatHeader from './ChatHeader';
 
 class App extends React.Component {
@@ -25,6 +26,11 @@ class App extends React.Component {
         FlexWebChat.MainHeader.Content.replace(
           <ChatHeader manager={ manager } key="ChatHeader"></ChatHeader>,
            { sortOrder: 1 }
+        );
+
+        FlexWebChat.EntryPoint.Content.add(
+          <ChatBadges manager={ manager } key="ChatBadges"></ChatBadges>,
+          { sortOrder: 1 }
         );
 
         // This loop is largely to mask that .chatClient is not loaded when
