@@ -1,10 +1,8 @@
-# Twilio Flex Web Chat UI Sample
+# RBFCU Flex Web Chat Sample
 
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app), then ejected to tweak the build scripts for our use-case (most notably disabling chunking to get one bundle).
 
-You can find the most recent version of the guide on how to perform common tasks [here](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md).
-
-This package can only be consumed together with Twilio Flex. Visit http://twilio.com/flex to find out more.
+The primary purpose of this implementation was to enable easy interop between an angular app, and a react app without any modifications to the original build system. The various workarounds for race conditions are also hidden within this wrapper.
 
 ## Instructions
 
@@ -12,11 +10,10 @@ This package can only be consumed together with Twilio Flex. Visit http://twilio
 ```
 npm install
 ```
-2. Copy webchat-appConfig.sample.js in public/assets folder and configure accordingly to use your Twilio account
+
+2. Build a bundle
 ```
-cp public/assets/webchat-appConfig.sample.js public/assets/webchat-appConfig.js
+npm run build
 ```
-3. Start Flex UI by running:
-```
-npm start
-```
+
+There's an example implementation and test file you can open in public/index.html -- the dev server (via npm start) does not currently work so the sids are hardcoded, that should be addressed at a later date.

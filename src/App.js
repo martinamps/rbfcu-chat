@@ -1,5 +1,5 @@
 import React from 'react';
-import * as FlexWebChat from "@twilio/flex-webchat-ui";
+import * as FlexWebChat from '@twilio/flex-webchat-ui';
 import ChatBadges from './ChatBadges';
 import ChatHeader from './ChatHeader';
 
@@ -10,7 +10,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const { configuration, resolve, reject } = props;
+    const { configuration, onEndCallback, resolve, reject } = props;
 
     // Workaround fix due in 2.0.1
     FlexWebChat.EntryPoint.defaultProps.tagline = configuration.componentProps.EntryPoint.tagline;
@@ -18,18 +18,18 @@ class App extends React.Component {
       .then(manager => {
         this.setState({ manager });
         if (configuration.hideEntryPoint)  {
-          FlexWebChat.RootContainer.Content.remove("entrypoint");
+          FlexWebChat.RootContainer.Content.remove('entrypoint');
         }
 
         // remove default predefned message
         FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage = false;
         FlexWebChat.MainHeader.Content.replace(
-          <ChatHeader manager={ manager } key="ChatHeader"></ChatHeader>,
+          <ChatHeader manager={manager} onEndCallback={onEndCallback} key='ChatHeader'></ChatHeader>,
            { sortOrder: 1 }
         );
 
         FlexWebChat.EntryPoint.Content.add(
-          <ChatBadges manager={ manager } key="ChatBadges"></ChatBadges>,
+          <ChatBadges manager={manager} key='ChatBadges'></ChatBadges>,
           { sortOrder: 1 }
         );
 
@@ -45,13 +45,9 @@ class App extends React.Component {
             reject('failed to initialize Flex Webchat');
           }
 
-          console.log('checking loaded');
-
           if (FlexWebChat.manager) {
-            console.log('chat client', FlexWebChat.manager.chatClient);
             if (FlexWebChat.manager.chatClient === undefined) {
               if (!triggeredVisibility) {
-                console.log('toggling visibility');
                 FlexWebChat.Actions.invokeAction('ToggleChatVisibility');
                 triggeredVisibility = true;
               }
@@ -62,19 +58,15 @@ class App extends React.Component {
                 triggeredVisibility = false;
                 stillValid = true;
                 // we seem to be loaded, let's go
-                console.log('loaded');
                 setTimeout(() => {
                   // We stayed in a happy state for the full validity period
                   if (stillValid) {
-                    console.log('passed validity period');
                     clearInterval(loop);
 
                     if (!FlexWebChat.manager.store.getState().flex.session.isEntryPointExpanded) {
                       FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
                     }
                     resolve();
-                  }  else {
-                    console.log('failed validity period');
                   }
                 }, 500);
               }
@@ -97,9 +89,9 @@ class App extends React.Component {
         </FlexWebChat.ContextProvider>
       );
     }
-    console.log('my stage is', this.state);
+
     if (error) {
-      console.error("Failed to initialize Flex Web Chat", error);
+      console.error('Failed to initialize Flex Web Chat', error);
     }
 
     return null;

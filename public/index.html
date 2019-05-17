@@ -11,10 +11,9 @@
         width: 100vw;
         height: 100vh;
         display: flex;
-        font-family: 'Open Sans', sans-serif;
+        font-family: sans-serif;
       }
     </style>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -29,14 +28,16 @@
       <div id="flexChat"></div>
     </div>
 
-    <script type="text/javascript" src="/Users/mamps/Downloads/chat-bundle.js"></script>
+    <script type="text/javascript" src="../build/static/js/chat-bundle.js"></script>
     <script type="text/javascript">
     function startChat() {
       window.loadFlexWebchat({
-        accountSid: "ACfd0eed7058d193ed1e4f68e977ac58ac",
-        flexFlowSid: "FOe9b78767ba60c87abea42ebeb2bb0aab",
-        container: "flexChat",
+        accountSid: "ACfd0e...", /* Account Sid */
+        flexFlowSid: "FOe9b...", /* Webchat FlexFlow */
+        container: "flexChat", /* the DOM element we're attaching to */
         hideEntryPoint: false
+      }, function(channel) {
+        console.log('ended', channel);
       }).then(() => {
         console.log('checking for messages');
         window.chatHasMessages().then(hasMessages => {

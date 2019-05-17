@@ -111,7 +111,7 @@ const appConfig = {
 let isLoaded = false;
 let container;
 
-window.loadFlexWebchat = function(overrides) {
+window.loadFlexWebchat = function(overrides, onEndCallback) {
   const config = Object.assign(appConfig, overrides);
   container = config.container;
   if (isLoaded) {
@@ -121,7 +121,7 @@ window.loadFlexWebchat = function(overrides) {
   return new Promise((resolve, reject) => {
     isLoaded = true;
     ReactDOM.render(
-      <App configuration={config} resolve={resolve} reject={reject} />,
+      <App configuration={config} onEndCallback={onEndCallback} resolve={resolve} reject={reject} />,
       document.getElementById(container)
     );
   });
@@ -135,22 +135,17 @@ function checkLoaded()  {
 
 window.toggleFlexWebchat = function()  {
   checkLoaded();
-  console.log('toggling webchat');
   window.Twilio.FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
 }
 
 function getChannel() {
   checkLoaded();
 
-  console.log('checking for channel');
   try {
     let chatClient = window.Twilio.FlexWebChat.manager.chatClient;
     let channelSid = chatClient.channels.channels.values().next().value.sid;
-    console.log('found channel');
-
     return window.Twilio.FlexWebChat.manager.chatClient.getChannelBySid(channelSid);
   } catch (e) {
-    console.log('no chat started');
     return Promise.reject(new Error('no chat started'));
   }
 }
@@ -158,7 +153,6 @@ function getChannel() {
 window.chatHasMessages = function() {
   checkLoaded();
   return getChannel().then(c => {
-    console.log('got channel', c);
     return c.messagesEntity.messagesByIndex.size > 0;
   }).catch(() => false);
 }
@@ -167,7 +161,6 @@ window.sendQuestion = function(question) {
   checkLoaded();
   return getChannel()
     .then(c =>  {
-      console.log('sending message');
       c.sendMessage(question);
     }).catch((e) => { console.log('not sending message', e); return false; });
 }

@@ -42,6 +42,8 @@ export default class ChatHeader extends React.Component {
     this.minimize = this.minimize.bind(this);
     this.showConfirm = this.showConfirm.bind(this);
     this.hideConfirm = this.hideConfirm.bind(this);
+    this.onEndCallback = props.onEndCallback;
+
     this.state = {
       showConfirm: false
     };
@@ -67,8 +69,9 @@ export default class ChatHeader extends React.Component {
 
     this.props.manager.chatClient.getChannelBySid(channelSid).then(channel => {
       channel.sendMessage('Left Chat');
-      FlexWebChat.Actions.invokeAction('MinimizeChat');
-      setTimeout(() => FlexWebChat.Actions.invokeAction('RestartEngagement'), 1000);
+      if (typeof this.onEndCallback === 'function') {
+        this.onEndCallback(channel);
+      }
     });
   }
 
