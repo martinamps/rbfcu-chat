@@ -49,7 +49,7 @@
     "workbox-webpack-plugin": "3.6.2"
   },
   "scripts": {
-    "start": "node scripts/start.js",
+    "start": "./scripts/start.sh",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
   },

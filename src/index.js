@@ -109,20 +109,28 @@ const appConfig = {
 };
 
 let isLoaded = false;
-let container;
+let rootContainer;
+let chatContainer;
 
 window.loadFlexWebchat = function(overrides, onEndCallback) {
   const config = Object.assign(appConfig, overrides);
-  container = config.container;
+
   if (isLoaded) {
     throw new Error('Flex Webchat already initialized');
   }
+
+  const containerId = 'flex-webchat-container';
+  rootContainer = document.getElementById(config.container);
+  chatContainer = document.createElement('div');
+  chatContainer.id = containerId;
+
+  rootContainer.appendChild(chatContainer);
 
   return new Promise((resolve, reject) => {
     isLoaded = true;
     ReactDOM.render(
       <App configuration={config} onEndCallback={onEndCallback} resolve={resolve} reject={reject} />,
-      document.getElementById(container)
+      document.getElementById(containerId)
     );
   });
 }
@@ -130,6 +138,15 @@ window.loadFlexWebchat = function(overrides, onEndCallback) {
 function checkLoaded()  {
   if (!isLoaded) {
     throw new Error('Flex is not initialized');
+  }
+}
+
+window.toggleFlexEntryPoint = function() {
+  checkLoaded();
+  if (rootContainer.style.display === 'none') {
+    rootContainer.style.display = '';
+  } else {
+    rootContainer.style.display = 'none';
   }
 }
 
