@@ -2,6 +2,7 @@ import React from 'react';
 import * as FlexWebChat from '@twilio/flex-webchat-ui';
 import ChatBadges from './ChatBadges';
 import ChatHeader from './ChatHeader';
+import FindAgent from './FindAgent';
 
 class App extends React.Component {
 
@@ -23,15 +24,6 @@ class App extends React.Component {
 
         // remove default predefned message
         FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage = false;
-        FlexWebChat.MainHeader.Content.replace(
-          <ChatHeader manager={manager} onEndCallback={onEndCallback} key='ChatHeader'></ChatHeader>,
-           { sortOrder: 1 }
-        );
-
-        FlexWebChat.EntryPoint.Content.add(
-          <ChatBadges manager={manager} key='ChatBadges'></ChatBadges>,
-          { sortOrder: 1 }
-        );
 
         // This loop is largely to mask that .chatClient is not loaded when
         // the Manager.create() promise resolves
@@ -66,6 +58,20 @@ class App extends React.Component {
                     if (!FlexWebChat.manager.store.getState().flex.session.isEntryPointExpanded) {
                       FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
                     }
+                    FlexWebChat.MainHeader.Content.replace(
+                      <ChatHeader manager={manager} onEndCallback={onEndCallback} key='ChatHeader'></ChatHeader>,
+                       { sortOrder: 1 }
+                    );
+
+                    FlexWebChat.EntryPoint.Content.add(
+                      <ChatBadges manager={manager} key='ChatBadges'></ChatBadges>,
+                      { sortOrder: 1 }
+                    );
+
+                    FlexWebChat.MessageList.WelcomeMessage.Content.replace(
+                      <FindAgent manager={ manager } key="FindAgent"></FindAgent>,
+                      { sortOrder: 1 }
+                    );
                     resolve();
                   }
                 }, 500);

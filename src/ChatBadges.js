@@ -22,13 +22,12 @@ export default class ChatBadges extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.init();
-    }, 2000)
+    this.init();
   }
 
   init() {
     const { flex } = this.props.manager.store.getState();
+    const cachedChannel = flex.chat.channels[Object.keys(flex.chat.channels)[0]];
 
     FlexWebChat.Actions.on('afterToggleChatVisibility', (p) => {
       let currentState = this.props.manager.store.getState().flex;
@@ -39,25 +38,22 @@ export default class ChatBadges extends React.Component {
       }
     });
 
-    this.props.manager.chatClient.getChannelBySid(flex.session.channelSid).then((source) => {
-      source.on('messageAdded', (message) => {
-        console.log(message);
-        let currentState = this.props.manager.store.getState().flex;
-        if (currentState.session.isEntryPointExpanded) {
-          this.setState({
-            unreadCount: 0
-          });
-          return;
-        }
+    cachedChannel.source.on('messageAdded', (message) => {
+      let currentState = this.props.manager.store.getState().flex;
+      if (currentState.session.isEntryPointExpanded) {
+        this.setState({
+          unreadCount: 0
+        });
+        return;
+      }
 
-        source.getUnconsumedMessagesCount().then(count => {
-          this.setState({
-            unreadCount: count
-          })
-          // play a sound if you wanted or had permission
+      cachedChannel.source.getUnconsumedMessagesCount().then(count => {
+        this.setState({
+          unreadCount: count
         })
+        // play a sound here if you wanted
       })
-    });
+    })
   }
 
   render() {
