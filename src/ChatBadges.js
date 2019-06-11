@@ -22,42 +22,49 @@ export default class ChatBadges extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.init();
-    }, 2000)
+    this.init();
   }
 
   init() {
-    const { flex } = this.props.manager.store.getState();
 
-    FlexWebChat.Actions.on('afterToggleChatVisibility', (p) => {
-      let currentState = this.props.manager.store.getState().flex;
-      if (currentState.session.isEntryPointExpanded) {
+    FlexWebChat.Actions.on('afterToggleChatVisibility', () => {
+      let { session } = this.props.manager.store.getState().flex;
+      if (session.isEntryPointExpanded) {
         this.setState({
           unreadCount: 0
         })
       }
     });
 
-    this.props.manager.chatClient.getChannelBySid(flex.session.channelSid).then((source) => {
-      source.on('messageAdded', (message) => {
-        console.log(message);
+    let channelPromise = new Promise((resolve, reject) => {
+      let interval = setInterval(() => {
         let currentState = this.props.manager.store.getState().flex;
-        if (currentState.session.isEntryPointExpanded) {
+        let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
+        if (undefined !== cachedChannel) {
+          clearInterval(interval);
+          resolve(cachedChannel.source);
+        }
+      }, 500)
+    });
+
+    channelPromise.then((cachedChannel) => {
+      cachedChannel.on('messageAdded', (message) => {
+        let { session } = this.props.manager.store.getState().flex;
+        if (session.isEntryPointExpanded) {
           this.setState({
             unreadCount: 0
           });
           return;
         }
-
-        source.getUnconsumedMessagesCount().then(count => {
+        message.channel.getUnconsumedMessagesCount().then(count => {
+          console.log('count unread:', count);
           this.setState({
             unreadCount: count
           })
-          // play a sound if you wanted or had permission
         })
-      })
-    });
+        .catch(e => { console.log(e) });
+      });
+    })
   }
 
   render() {

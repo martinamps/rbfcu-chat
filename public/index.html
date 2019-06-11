@@ -19,7 +19,7 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="flexChatWrapper">
       <button onclick="startChat();">Start Chat</button>
-      <button 
+      <button
         style="position:absolute; bottom:0; right:10px;"
         onclick="window.toggleFlexWebchat();"
       >
@@ -31,21 +31,26 @@
     <script type="text/javascript" src="../build/static/js/chat-bundle.js"></script>
     <script type="text/javascript">
     function startChat() {
-      window.loadFlexWebchat({
-        accountSid: "{accountSid}", /* Account Sid */
-        flexFlowSid: "{flowSid}", /* Webchat FlexFlow */
-        container: "flexChat", /* the DOM element we're attaching to */
-        hideEntryPoint: false
-      }, function(channel) {
-        console.log('ended', channel);
-      }).then(() => {
-        console.log('checking for messages');
-        window.chatHasMessages().then(hasMessages => {
-          if (!hasMessages) {
-            window.sendQuestion('hello');
-          }
+      if (undefined === window.Twilio) {
+        window.loadFlexWebchat({
+          accountSid: "{accountSid}", /* Account Sid */
+          flexFlowSid: "{flowSid}", /* Webchat FlexFlow */
+          container: "flexChat", /* the DOM element we're attaching to */
+          hideEntryPoint: false
+        }, function(channel) {
+          channel.sendMessage('Left Chat!').then(() => {
+            console.log('should end the chat now. figure it out.')
+          });
+        }).then(() => {
+          window.chatHasMessages().then(hasMessages => {
+            if (!hasMessages) {
+              window.sendQuestion('hello');
+            }
+          });
         });
-      });
+      } else {
+        window.Twilio.FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
+      }
     }
     </script>
   </body>

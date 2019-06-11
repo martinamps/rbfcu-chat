@@ -68,7 +68,6 @@ export default class ChatHeader extends React.Component {
     });
 
     this.props.manager.chatClient.getChannelBySid(channelSid).then(channel => {
-      channel.sendMessage('Left Chat');
       if (typeof this.onEndCallback === 'function') {
         this.onEndCallback(channel);
       }

@@ -7,6 +7,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import 'regenerator-runtime/runtime';
 import App from './App';
+import * as FlexWebChat from "@twilio/flex-webchat-ui";
 
 const brandColor0 = "#1976d2";
 const brandColor1 = "#233659";
@@ -85,7 +86,7 @@ const appConfig = {
     MessagingCanvas: {
       showTrayOnInactive: false,
       showReadStatus: false,
-      showWelcomeMessage: false,
+      showWelcomeMessage: true,
     },
     MessageCanvasTray: {
       showButton: false,
@@ -152,7 +153,7 @@ window.toggleFlexEntryPoint = function() {
 
 window.toggleFlexWebchat = function()  {
   checkLoaded();
-  window.Twilio.FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
+  FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
 }
 
 function getChannel() {
