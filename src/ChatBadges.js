@@ -48,6 +48,7 @@ export default class ChatBadges extends React.Component {
     });
 
     channelPromise.then((cachedChannel) => {
+
       cachedChannel.on('messageAdded', (message) => {
         let { session } = this.props.manager.store.getState().flex;
         if (session.isEntryPointExpanded) {
@@ -57,7 +58,6 @@ export default class ChatBadges extends React.Component {
           return;
         }
         message.channel.getUnconsumedMessagesCount().then(count => {
-          console.log('count unread:', count);
           this.setState({
             unreadCount: count
           })

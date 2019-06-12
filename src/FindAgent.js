@@ -11,7 +11,7 @@ export default class FindAgent extends React.Component {
     this.props = props;
     this.init = this.init.bind(this);
     this.state = {
-      agentJoined: true
+      agentJoined: false
     }
   }
 

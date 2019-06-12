@@ -39,7 +39,7 @@
           hideEntryPoint: false
         }, function(channel) {
           channel.sendMessage('Left Chat!').then(() => {
-            console.log('should end the chat now. figure it out.')
+            console.log('onEndCallback Called')
           });
         }).then(() => {
           window.chatHasMessages().then(hasMessages => {

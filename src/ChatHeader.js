@@ -63,14 +63,31 @@ export default class ChatHeader extends React.Component {
 
   endChat() {
     const { channelSid } = this.props.manager.store.getState().flex.session;
+
     this.setState({
       showConfirm: false
     });
 
     this.props.manager.chatClient.getChannelBySid(channelSid).then(channel => {
-      if (typeof this.onEndCallback === 'function') {
-        this.onEndCallback(channel);
+
+      const { token } = this.props.manager.store.getState().flex.session.tokenPayload;
+      const { attributes } = channel;
+
+      if (!attributes.taskSid && !attributes.runTimeDomain) {
+        throw Error('Could not end chat because the task Sid is not in the channel attributes.');
       }
+
+      fetch(`https://${attributes.runTimeDomain}/wrap-task`, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        method: 'POST',
+        body: `Token=${token}&taskSid=${attributes.taskSid}`
+      }).then(() => {
+        if (typeof this.onEndCallback === 'function') {
+          this.onEndCallback(channel);
+        }
+      })
     });
   }
 
