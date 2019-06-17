@@ -160,7 +160,12 @@ window.hideFlex = function() {
 
 window.toggleFlexWebchat = function()  {
   checkLoaded();
-  FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
+  FlexWebChat.Actions.invokeAction('ToggleChatVisibility');
+}
+
+window.restartEngagement = function() {
+  checkLoaded();
+  FlexWebChat.Actions.invokeAction('RestartEngagement');
 }
 
 function getChannel() {
