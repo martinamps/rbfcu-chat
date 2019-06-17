@@ -27,6 +27,8 @@ class App extends React.Component {
           FlexWebChat.RootContainer.Content.remove('entrypoint');
         }
 
+        FlexWebChat.MessagingCanvas.Content.remove('tray');
+
         // remove default predefned message
         FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage = false;
 
