@@ -11,7 +11,7 @@ export default class FindAgent extends React.Component {
     this.props = props;
     this.init = this.init.bind(this);
     this.state = {
-      agentJoined: false
+      agentJoined: true
     }
   }
 
@@ -36,6 +36,10 @@ export default class FindAgent extends React.Component {
         this.setState({
           agentJoined: true
         })
+      } else {
+        this.setState({
+          agentJoined: false
+        })
       }
 
       cachedChannel.on('memberJoined', (member) => {
@@ -43,8 +47,13 @@ export default class FindAgent extends React.Component {
           this.setState({
             agentJoined: true
           })
+        } else {
+          this.setState({
+            agentJoined: false
+          })
         }
       })
+
     })
   }
 
