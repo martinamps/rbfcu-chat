@@ -89,7 +89,7 @@ const appConfig = {
       showWelcomeMessage: true,
     },
     MessageCanvasTray: {
-      showButton: false,
+      showButton: true,
     },
     EntryPoint: {
       tagline: "ongoing chat",
@@ -112,15 +112,15 @@ const appConfig = {
 let isLoaded = false;
 let rootContainer;
 let chatContainer;
+const containerId = 'flex-webchat-container';
 
 window.loadFlexWebchat = function(overrides, onEndCallback) {
   const config = Object.assign(appConfig, overrides);
 
   if (isLoaded) {
-    throw new Error('Flex Webchat already initialized');
+    return Promise.resolve();
   }
 
-  const containerId = 'flex-webchat-container';
   rootContainer = document.getElementById(config.container);
   chatContainer = document.createElement('div');
   chatContainer.id = containerId;
@@ -149,6 +149,16 @@ window.toggleFlexEntryPoint = function() {
   } else {
     rootContainer.style.display = 'none';
   }
+}
+
+window.showFlex = function() {
+  checkLoaded();
+  rootContainer.style.display = '';
+}
+
+window.hideFlex = function() {
+  checkLoaded();
+  rootContainer.style.display = 'none';
 }
 
 window.toggleFlexWebchat = function()  {

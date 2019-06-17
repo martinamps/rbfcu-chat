@@ -18,39 +18,48 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="flexChatWrapper">
-      <button onclick="startChat();">Start Chat</button>
-      <button
-        style="position:absolute; bottom:0; right:10px;"
-        onclick="window.toggleFlexWebchat();"
-      >
-        Hello
-      </button>
-      <div id="flexChat"></div>
+      <button onclick="startChat('hello', true);">Start Chat</button>
+      <div id="flexChat" style="display:none;"></div>
     </div>
 
     <script type="text/javascript" src="../build/static/js/chat-bundle.js"></script>
     <script type="text/javascript">
-    function startChat() {
-      if (undefined === window.Twilio) {
-        window.loadFlexWebchat({
-          accountSid: "{accountSid}", /* Account Sid */
-          flexFlowSid: "{flowSid}", /* Webchat FlexFlow */
-          container: "flexChat", /* the DOM element we're attaching to */
-          hideEntryPoint: false
-        }, function(channel) {
-          channel.sendMessage('Left Chat!').then(() => {
-            console.log('onEndCallback Called')
-          });
-        }).then(() => {
-          window.chatHasMessages().then(hasMessages => {
-            if (!hasMessages) {
-              window.sendQuestion('hello');
-            }
-          });
-        });
-      } else {
-        window.Twilio.FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
+
+    // as soon as the page loads, we need to determine if we should boot flex webchat.
+    // we can accomplish this by checking localstorage
+    // flex.session.engagementState === "CF_IN_ENGAGEMENT"
+    // we do this in case a chat is already active, we want to bring it up automatically
+    if (window.localStorage.getItem('twilio-flex-cf') !== null) {
+      let { flex } = JSON.parse(window.localStorage.getItem('twilio-flex-cf'));
+      if (flex.session && flex.session.engagementStage === "CF_IN_ENGAGEMENT") {
+        startChat();
       }
+    }
+
+    function startChat(message = null, show = false) {
+      window.loadFlexWebchat({
+        accountSid: "{accountSid}", /* Account Sid */
+        flexFlowSid: "{flowSid}", /* Webchat FlexFlow */
+        container: "flexChat", /* the DOM element we're attaching to */
+        hideEntryPoint: false
+      }, function(channel) {
+        channel.sendMessage('Left Chat!').then(() => {
+          window.hideFlex();
+          window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
+        });
+      }).then(() => {
+        if (show) {
+          window.showFlex();
+        }
+        window.chatHasMessages().then(hasMessages => {
+          if (!hasMessages && message) {
+            window.sendQuestion(message);
+          }
+          if (hasMessages) {
+            window.showFlex();
+          }
+        })
+      });
     }
     </script>
   </body>
