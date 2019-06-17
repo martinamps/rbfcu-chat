@@ -50,18 +50,7 @@ export default class ChatHeader extends React.Component {
   }
 
   componentDidMount() {
-    let channelPromise = new Promise((resolve, reject) => {
-      let interval = setInterval(() => {
-        let currentState = this.props.manager.store.getState().flex;
-        let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
-        if (undefined !== cachedChannel) {
-          clearInterval(interval);
-          resolve(cachedChannel.source);
-        }
-      }, 500)
-    });
-
-    channelPromise.then((cachedChannel) => {
+    this.props.channelPromise.then((cachedChannel) => {
       cachedChannel.on('updated', ({ channel, updateReasons }) => {
         if (
           updateReasons.indexOf('attributes') !== -1 &&

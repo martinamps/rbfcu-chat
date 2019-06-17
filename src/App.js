@@ -18,31 +18,52 @@ class App extends React.Component {
     FlexWebChat.Manager.create(configuration)
       .then(manager => {
 
+        this.setState({ manager });
+
+        // set some variables on the global window object
+        // these help us determine if flex has loaded or not
         window.Twilio = window.Twilio || {};
         FlexWebChat.manager =  manager;
-        this.setState({ manager });
         window.Twilio.FlexWebChat = FlexWebChat;
 
+        // create a global promise that will resolve when the chat channel finally been loaded
+        // we'll pass this down as a prop to each of our custom components
+        let channelPromise = new Promise((resolve, reject) => {
+          let interval = setInterval(() => {
+            let currentState = manager.store.getState().flex;
+            let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
+            if (undefined !== cachedChannel) {
+              clearInterval(interval);
+              resolve(cachedChannel.source);
+            }
+          }, 250)
+        });
+
+        // hide entry point if configured to do so
         if (configuration.hideEntryPoint)  {
           FlexWebChat.RootContainer.Content.remove('entrypoint');
         }
 
+        // remove FlexWebChat Canvas Tray (displayed when channel goes inactive)
         FlexWebChat.MessagingCanvas.Content.remove('tray');
 
         // remove default predefned message
         FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage = false;
 
+        // replace the default chat header
         FlexWebChat.MainHeader.Content.replace(
-          <ChatHeader manager={manager} onEndCallback={onEndCallback} key='ChatHeader'></ChatHeader>,
+          <ChatHeader manager={manager} channelPromise={channelPromise} onEndCallback={onEndCallback} key='ChatHeader'></ChatHeader>,
            { sortOrder: 1 }
         );
 
+        // add chat badges to the entry point component
         FlexWebChat.EntryPoint.Content.add(
-          <ChatBadges manager={manager} key='ChatBadges'></ChatBadges>,
+          <ChatBadges manager={manager} channelPromise={channelPromise} key='ChatBadges'></ChatBadges>,
           { sortOrder: 1 }
         );
 
-        FlexWebChat.MessageList.WelcomeMessage.Content.replace(<FindAgent manager={ manager } key="FindAgent"></FindAgent>, {
+        // We got clever and replaced the welcome message with our own Finding Agent Spinner
+        FlexWebChat.MessageList.WelcomeMessage.Content.replace(<FindAgent manager={ manager } channelPromise={channelPromise} key="FindAgent"></FindAgent>, {
           sortOrder: 1
         })
 

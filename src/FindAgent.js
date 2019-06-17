@@ -20,18 +20,7 @@ export default class FindAgent extends React.Component {
   }
 
   init() {
-    let channelPromise = new Promise((resolve, reject) => {
-      let interval = setInterval(() => {
-        let currentState = this.props.manager.store.getState().flex;
-        let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
-        if (undefined !== cachedChannel) {
-          clearInterval(interval);
-          resolve(cachedChannel.source);
-        }
-      }, 500)
-    });
-
-    channelPromise.then(cachedChannel => {
+    this.props.channelPromise.then(cachedChannel => {
       if (cachedChannel.members.size > 1) {
         this.setState({
           agentJoined: true

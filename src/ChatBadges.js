@@ -36,18 +36,7 @@ export default class ChatBadges extends React.Component {
       }
     });
 
-    let channelPromise = new Promise((resolve, reject) => {
-      let interval = setInterval(() => {
-        let currentState = this.props.manager.store.getState().flex;
-        let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
-        if (undefined !== cachedChannel) {
-          clearInterval(interval);
-          resolve(cachedChannel.source);
-        }
-      }, 500)
-    });
-
-    channelPromise.then((cachedChannel) => {
+    this.props.channelPromise.then((cachedChannel) => {
 
       cachedChannel.on('messageAdded', (message) => {
         let { session } = this.props.manager.store.getState().flex;
