@@ -149,12 +149,10 @@ window.toggleFlexEntryPoint = function() {
 }
 
 window.showFlex = function() {
-  checkLoaded();
   rootContainer.style.display = '';
 }
 
 window.hideFlex = function() {
-  checkLoaded();
   rootContainer.style.display = 'none';
 }
 
