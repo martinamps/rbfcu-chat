@@ -25,6 +25,10 @@
     <script type="text/javascript" src="../build/static/js/chat-bundle.js"></script>
     <script type="text/javascript">
 
+    window.addEventListener('flexMessageSentToChannel', (e) => {
+      console.log('a message was sent!');
+    })
+
     // as soon as the page loads, we need to determine if we should boot flex webchat.
     // we can accomplish this by checking localstorage
     // flex.session.engagementState === "CF_IN_ENGAGEMENT"

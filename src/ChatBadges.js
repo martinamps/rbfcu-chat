@@ -39,6 +39,10 @@ export default class ChatBadges extends React.Component {
     this.props.channelPromise.then((cachedChannel) => {
 
       cachedChannel.on('messageAdded', (message) => {
+
+        var event = new Event('flexMessageSentToChannel');
+        window.dispatchEvent(event);
+
         let { session } = this.props.manager.store.getState().flex;
         if (session.isEntryPointExpanded) {
           this.setState({
