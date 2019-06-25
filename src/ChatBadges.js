@@ -16,6 +16,7 @@ export default class ChatBadges extends React.Component {
     super();
     this.props = props;
     this.init = this.init.bind(this);
+    this.setupChannelListener = this.setupChannelListener.bind(this);
     this.state = {
       unreadCount: 0
     }
@@ -23,10 +24,14 @@ export default class ChatBadges extends React.Component {
 
   componentDidMount() {
     this.init();
+    this.setupChannelListener();
+  }
+
+  componentWillUpdate() {
+    this.setupChannelListener();
   }
 
   init() {
-
     FlexWebChat.Actions.on('afterToggleChatVisibility', () => {
       let { session } = this.props.manager.store.getState().flex;
       if (session.isEntryPointExpanded) {
@@ -35,11 +40,11 @@ export default class ChatBadges extends React.Component {
         })
       }
     });
+  }
 
-    this.props.channelPromise.then((cachedChannel) => {
-
+  setupChannelListener() {
+    this.props.getChannel().then((cachedChannel) => {
       cachedChannel.on('messageAdded', (message) => {
-
         var event = new Event('flexMessageSentToChannel');
         window.dispatchEvent(event);
 

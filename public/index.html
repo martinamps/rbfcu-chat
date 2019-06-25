@@ -18,16 +18,21 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="flexChatWrapper">
-      <button onclick="startChat('hello', true);">Start Chat</button>
+      <button onclick="startChat({
+        friendlyName: 'Clicked Customer',
+        question: 'This is my specified question',
+        category: 'Checks'
+      });">Start Chat</button>
+      <button onclick="startChat({
+        friendlyName: 'Second Clicked Customer',
+        question: 'This is my specified question',
+        category: 'Checks'
+      });">Second Start Chat</button>
       <div id="flexChat" style="display:none;"></div>
     </div>
 
     <script type="text/javascript" src="../build/static/js/chat-bundle.js"></script>
     <script type="text/javascript">
-
-    window.addEventListener('flexMessageSentToChannel', (e) => {
-      console.log('a message was sent!');
-    })
 
     // as soon as the page loads, we need to determine if we should boot flex webchat.
     // we can accomplish this by checking localstorage
@@ -38,32 +43,23 @@
       let { flex } = JSON.parse(window.localStorage.getItem('twilio-flex-cf'));
       if (flex.session && flex.session.engagementStage === "CF_IN_ENGAGEMENT") {
         startChat();
+      } else {
+        window.hideFlex();
       }
     }
 
-    function startChat(message = null, show = false) {
+    function startChat(context = {}) {
       window.loadFlexWebchat({
         accountSid: "{accountSid}", /* Account Sid */
         flexFlowSid: "{flowSid}", /* Webchat FlexFlow */
         container: "flexChat", /* the DOM element we're attaching to */
         hideEntryPoint: false
-      }, function(channel) {
-        window.hideFlex();
-        channel.sendMessage('Left Chat!').then(() => {
-          window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
-        });
       }).then(() => {
-        if (show) {
-          window.showFlex();
+        if (context) {
+          window.Twilio.FlexWebChat.Actions.invokeAction('StartEngagement', {
+            formData: context
+          });
         }
-        window.chatHasMessages().then(hasMessages => {
-          if (!hasMessages && message) {
-            window.sendQuestion(message);
-          }
-          if (hasMessages) {
-            window.showFlex();
-          }
-        })
       });
     }
     </script>

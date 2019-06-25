@@ -11,14 +11,19 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const { configuration, onEndCallback, resolve, reject } = props;
+    const { configuration, resolve, reject } = props;
+
+    this.getChannel = this.getChannel.bind(this);
 
     // Workaround fix due in 2.0.1
     FlexWebChat.EntryPoint.defaultProps.tagline = configuration.componentProps.EntryPoint.tagline;
     FlexWebChat.Manager.create(configuration)
       .then(manager => {
 
-        this.setState({ manager });
+        this.setState({
+          manager: manager,
+          channel: null
+        });
 
         // set some variables on the global window object
         // these help us determine if flex has loaded or not
@@ -26,18 +31,31 @@ class App extends React.Component {
         FlexWebChat.manager =  manager;
         window.Twilio.FlexWebChat = FlexWebChat;
 
-        // create a global promise that will resolve when the chat channel finally been loaded
-        // we'll pass this down as a prop to each of our custom components
-        let channelPromise = new Promise((resolve, reject) => {
-          let interval = setInterval(() => {
-            let currentState = manager.store.getState().flex;
-            let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
-            if (undefined !== cachedChannel) {
-              clearInterval(interval);
-              resolve(cachedChannel.source);
-            }
-          }, 250)
+        FlexWebChat.Actions.on("afterStartEngagement", (payload) => {
+          window.showFlex();
+          let currentState = manager.store.getState().flex;
+          if (!currentState.session.isEntryPointExpanded) {
+            window.toggleFlexWebchat();
+          }
+          const { question } = payload.formData;
+          if (!question) return;
+
+          const { channelSid } = manager.store.getState().flex.session;
+          manager.chatClient.getChannelBySid(channelSid)
+              .then(channel => {
+                  this.setState({ channel });
+                  channel.sendMessage(question);
+              });
         });
+
+        FlexWebChat.Actions.on("beforeRestartEngagement", (payload) => {
+          window.hideFlex();
+          let currentState = manager.store.getState().flex;
+          let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
+          cachedChannel.source.sendMessage('Left Chat!');
+        })
+
+        resolve();
 
         // hide entry point if configured to do so
         if (configuration.hideEntryPoint)  {
@@ -52,63 +70,31 @@ class App extends React.Component {
 
         // replace the default chat header
         FlexWebChat.MainHeader.Content.replace(
-          <ChatHeader manager={manager} channelPromise={channelPromise} onEndCallback={onEndCallback} key='ChatHeader'></ChatHeader>,
+          <ChatHeader manager={manager} getChannel={this.getChannel} key='ChatHeader'></ChatHeader>,
            { sortOrder: 1 }
         );
 
         // add chat badges to the entry point component
         FlexWebChat.EntryPoint.Content.add(
-          <ChatBadges manager={manager} channelPromise={channelPromise} key='ChatBadges'></ChatBadges>,
+          <ChatBadges manager={manager} getChannel={this.getChannel} key='ChatBadges'></ChatBadges>,
           { sortOrder: 1 }
         );
 
         // We got clever and replaced the welcome message with our own Finding Agent Spinner
-        FlexWebChat.MessageList.WelcomeMessage.Content.replace(<FindAgent manager={ manager } channelPromise={channelPromise} key="FindAgent"></FindAgent>, {
+        FlexWebChat.MessageList.WelcomeMessage.Content.replace(<FindAgent manager={ manager } getChannel={this.getChannel} key="FindAgent"></FindAgent>, {
           sortOrder: 1
         })
 
-        // This loop is largely to mask that .chatClient is not loaded when
-        // the Manager.create() promise resolves
-        let maxTries = 40; // 40 * 250 = 10s
-        let triggeredVisibility = false;
-
-        let stillValid = false;
-        let loop = setInterval(() =>  {
-          if (!maxTries--) {
-            clearInterval(loop);
-            reject('failed to initialize Flex Webchat');
-          }
-
-          if (FlexWebChat.manager) {
-            if (FlexWebChat.manager.chatClient === undefined) {
-              if (!triggeredVisibility) {
-                FlexWebChat.Actions.invokeAction('ToggleChatVisibility');
-                triggeredVisibility = true;
-              }
-
-              stillValid = false;
-            } else {
-              if (FlexWebChat.manager.chatClient.connectionState !== 'connecting') {
-                triggeredVisibility = false;
-                stillValid = true;
-                // we seem to be loaded, let's go
-                setTimeout(() => {
-                  // We stayed in a happy state for the full validity period
-                  if (stillValid) {
-                    clearInterval(loop);
-
-                    if (!FlexWebChat.manager.store.getState().flex.session.isEntryPointExpanded) {
-                      FlexWebChat.Actions.invokeAction('ToggleChatVisibility')
-                    }
-                    resolve();
-                  }
-                }, 500);
-              }
-            }
-          }
-        }, 250);
-
       }).catch(error => this.setState({ error }));
+  }
+
+  getChannel() {
+    return new Promise((resolve, reject) => {
+      if (!this.state.channel) {
+        reject('Awaiting chat engagement to start.')
+      }
+      resolve(this.state.channel);
+    })
   }
 
   render() {

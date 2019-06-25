@@ -9,18 +9,18 @@ export default class FindAgent extends React.Component {
   constructor(props) {
     super();
     this.props = props;
-    this.init = this.init.bind(this);
+    this.setUpChannelListener = this.setUpChannelListener.bind(this);
     this.state = {
       agentJoined: true
     }
   }
 
   componentDidMount() {
-    this.init();
+    this.setUpChannelListener()
   }
 
-  init() {
-    this.props.channelPromise.then(cachedChannel => {
+  setUpChannelListener() {
+    this.props.getChannel().then(cachedChannel => {
       if (cachedChannel.members.size > 1) {
         this.setState({
           agentJoined: true
@@ -30,7 +30,6 @@ export default class FindAgent extends React.Component {
           agentJoined: false
         })
       }
-
       cachedChannel.on('memberJoined', (member) => {
         if (cachedChannel.members.size > 1) {
           this.setState({
@@ -42,7 +41,6 @@ export default class FindAgent extends React.Component {
           })
         }
       })
-
     })
   }
 

@@ -75,7 +75,7 @@ const brandedColors = {
 };
 
 const appConfig = {
-  startEngagementOnInit: true,
+  startEngagementOnInit: false,
   colorTheme: {
     overrides: brandedColors,
   },
@@ -111,7 +111,7 @@ let rootContainer;
 let chatContainer;
 const containerId = 'flex-webchat-container';
 
-window.loadFlexWebchat = function(overrides, onEndCallback) {
+window.loadFlexWebchat = function(overrides) {
   const config = Object.assign(appConfig, overrides);
 
   if (isLoaded) {
@@ -127,7 +127,7 @@ window.loadFlexWebchat = function(overrides, onEndCallback) {
   return new Promise((resolve, reject) => {
     isLoaded = true;
     ReactDOM.render(
-      <App configuration={config} onEndCallback={onEndCallback} resolve={resolve} reject={reject} />,
+      <App configuration={config} resolve={resolve} reject={reject} />,
       document.getElementById(containerId)
     );
   });
@@ -149,11 +149,15 @@ window.toggleFlexEntryPoint = function() {
 }
 
 window.showFlex = function() {
-  rootContainer.style.display = '';
+  if (rootContainer) {
+    rootContainer.style.display = '';
+  }
 }
 
 window.hideFlex = function() {
-  rootContainer.style.display = 'none';
+  if (rootContainer) {
+    rootContainer.style.display = 'none';
+  }
 }
 
 window.toggleFlexWebchat = function()  {
@@ -164,31 +168,4 @@ window.toggleFlexWebchat = function()  {
 window.restartEngagement = function() {
   checkLoaded();
   FlexWebChat.Actions.invokeAction('RestartEngagement');
-}
-
-function getChannel() {
-  checkLoaded();
-
-  try {
-    let chatClient = window.Twilio.FlexWebChat.manager.chatClient;
-    let channelSid = chatClient.channels.channels.values().next().value.sid;
-    return window.Twilio.FlexWebChat.manager.chatClient.getChannelBySid(channelSid);
-  } catch (e) {
-    return Promise.reject(new Error('no chat started'));
-  }
-}
-
-window.chatHasMessages = function() {
-  checkLoaded();
-  return getChannel().then(c => {
-    return c.messagesEntity.messagesByIndex.size > 0;
-  }).catch(() => false);
-}
-
-window.sendQuestion = function(question) {
-  checkLoaded();
-  return getChannel()
-    .then(c =>  {
-      c.sendMessage(question);
-    }).catch((e) => { console.log('not sending message', e); return false; });
 }

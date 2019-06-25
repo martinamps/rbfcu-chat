@@ -42,7 +42,7 @@ export default class ChatHeader extends React.Component {
     this.minimize = this.minimize.bind(this);
     this.showConfirm = this.showConfirm.bind(this);
     this.hideConfirm = this.hideConfirm.bind(this);
-    this.onEndCallback = props.onEndCallback;
+    this.setUpChannelListener = this.setUpChannelListener.bind(this);
 
     this.state = {
       showConfirm: false
@@ -50,19 +50,24 @@ export default class ChatHeader extends React.Component {
   }
 
   componentDidMount() {
-    this.props.channelPromise.then((cachedChannel) => {
+    this.setUpChannelListener()
+  }
+
+  componentWillUpdate() {
+    this.setUpChannelListener()
+  }
+
+  setUpChannelListener() {
+    this.props.getChannel().then((cachedChannel) => {
       cachedChannel.on('updated', ({ channel, updateReasons }) => {
         if (
           updateReasons.indexOf('attributes') !== -1 &&
           channel.state.attributes.status === "INACTIVE"
         ) {
-          if (typeof this.onEndCallback === 'function') {
-            this.onEndCallback(channel);
-            cachedChannel = null;
-          }
+          window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
         }
       })
-    });
+    }).catch(e => { console.log(e) });
   }
 
   showConfirm() {
@@ -100,9 +105,7 @@ export default class ChatHeader extends React.Component {
         method: 'POST',
         body: `Token=${token}&taskSid=${attributes.taskSid}&channelSid=${channel.sid}`
       }).then(() => {
-        if (typeof this.onEndCallback === 'function') {
-          this.onEndCallback(channel);
-        }
+        window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
       })
     });
   }
