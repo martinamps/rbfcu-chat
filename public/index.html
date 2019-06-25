@@ -48,6 +48,10 @@
       }
     }
 
+    window.addEventListener('flexChatEngagementEnded', function() {
+      console.log('show rbfcu button!');
+    })
+
     function startChat(context = {}) {
       window.loadFlexWebchat({
         accountSid: "{accountSid}", /* Account Sid */

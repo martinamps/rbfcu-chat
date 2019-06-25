@@ -53,6 +53,8 @@ class App extends React.Component {
           let currentState = manager.store.getState().flex;
           let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
           cachedChannel.source.sendMessage('Left Chat!');
+          var event = new Event('flexChatEngagementEnded');
+          window.dispatchEvent(event);
         })
 
         resolve();
