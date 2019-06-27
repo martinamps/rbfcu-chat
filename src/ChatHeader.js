@@ -42,32 +42,10 @@ export default class ChatHeader extends React.Component {
     this.minimize = this.minimize.bind(this);
     this.showConfirm = this.showConfirm.bind(this);
     this.hideConfirm = this.hideConfirm.bind(this);
-    this.setUpChannelListener = this.setUpChannelListener.bind(this);
 
     this.state = {
       showConfirm: false
     };
-  }
-
-  componentDidMount() {
-    this.setUpChannelListener()
-  }
-
-  componentWillUpdate() {
-    this.setUpChannelListener()
-  }
-
-  setUpChannelListener() {
-    this.props.getChannel().then((cachedChannel) => {
-      cachedChannel.on('updated', ({ channel, updateReasons }) => {
-        if (
-          updateReasons.indexOf('attributes') !== -1 &&
-          channel.state.attributes.status === "INACTIVE"
-        ) {
-          window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
-        }
-      })
-    }).catch(e => { console.log(e) });
   }
 
   showConfirm() {
