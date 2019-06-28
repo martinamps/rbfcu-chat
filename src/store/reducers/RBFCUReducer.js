@@ -12,7 +12,8 @@ const initialState = {
   listeners: false,
   channel: null,
   unreadCount: 0,
-  agentJoined: false
+  agentJoined: false,
+  showSpinner: false
 };
 
 const RBFCUReducer = (state = initialState, action) => {
@@ -36,6 +37,11 @@ const RBFCUReducer = (state = initialState, action) => {
       return {
         ...state,
         agentJoined: action.payload.agentJoined
+      };
+    case 'SET_RBFCU_SHOW_SPINNER':
+      return {
+        ...state,
+        showSpinner: action.payload.showSpinner
       };
     default:
       return state;

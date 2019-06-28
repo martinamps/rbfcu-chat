@@ -8,6 +8,7 @@ import ReactDOM from 'react-dom';
 import 'regenerator-runtime/runtime';
 import App from './App';
 import * as FlexWebChat from "@twilio/flex-webchat-ui";
+import Utils from './utils/index';
 
 const brandColor0 = "#1976d2";
 const brandColor1 = "#233659";
@@ -167,5 +168,30 @@ window.toggleFlexWebchat = function()  {
 
 window.restartEngagement = function() {
   checkLoaded();
-  FlexWebChat.Actions.invokeAction('RestartEngagement');
+  const { token } = window.Twilio.FlexWebChat.manager.store.getState().flex.session.tokenPayload;
+  const { channel } = window.Twilio.FlexWebChat.manager.store.getState().rbfcu;
+  window.Twilio.FlexWebChat.manager.store.dispatch({
+    type: 'SET_RBFCU_SHOW_SPINNER',
+    payload: {
+      showSpinner: true
+    }
+  });
+  Utils.pushTaskToWrapping(token, channel).then(() => {
+    window.hideFlex();
+    FlexWebChat.Actions.invokeAction('RestartEngagement');
+    window.Twilio.FlexWebChat.manager.store.dispatch({
+      type: 'SET_RBFCU_SHOW_SPINNER',
+      payload: {
+        showSpinner: false
+      }
+    });
+  }).catch((e) => {
+    console.error(e);
+    window.Twilio.FlexWebChat.manager.store.dispatch({
+      type: 'SET_RBFCU_SHOW_SPINNER',
+      payload: {
+        showSpinner: false
+      }
+    });
+  })
 }

@@ -1,5 +1,7 @@
 import React from 'react';
 import * as FlexWebChat from "@twilio/flex-webchat-ui";
+import { connect } from 'react-redux';
+import Utils from './utils/index';
 
 const padding = {
   paddingLeft: '10px',
@@ -34,7 +36,7 @@ const modal = {
 }
 
 
-export default class ChatHeader extends React.Component {
+class ChatHeader extends React.Component {
   constructor(props) {
     super();
     this.props = props;
@@ -61,31 +63,35 @@ export default class ChatHeader extends React.Component {
   }
 
   endChat() {
-    const { channelSid } = this.props.manager.store.getState().flex.session;
+    this.hideConfirm();
 
-    this.setState({
-      showConfirm: false
-    });
+    const { token } = this.props.manager.store.getState().flex.session.tokenPayload;
 
-    this.props.manager.chatClient.getChannelBySid(channelSid).then(channel => {
-
-      const { token } = this.props.manager.store.getState().flex.session.tokenPayload;
-      const { attributes } = channel;
-
-      if (!attributes.taskSid && !attributes.runTimeDomain) {
-        throw Error('Could not end chat because the task Sid is not in the channel attributes.');
+    this.props.manager.store.dispatch({
+      type: 'SET_RBFCU_SHOW_SPINNER',
+      payload: {
+        showSpinner: true
       }
-
-      fetch(`https://${attributes.runTimeDomain}/wrap-task`, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        method: 'POST',
-        body: `Token=${token}&taskSid=${attributes.taskSid}&channelSid=${channel.sid}`
-      }).then(() => {
-        window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
-      })
     });
+
+    Utils.pushTaskToWrapping(token, this.props.channel).then(() => {
+      window.hideFlex();
+      FlexWebChat.Actions.invokeAction('RestartEngagement');
+      this.props.manager.store.dispatch({
+        type: 'SET_RBFCU_SHOW_SPINNER',
+        payload: {
+          showSpinner: false
+        }
+      });
+    }).catch((e) => {
+      this.props.manager.store.dispatch({
+        type: 'SET_RBFCU_SHOW_SPINNER',
+        payload: {
+          showSpinner: false
+        }
+      });
+      console.error(e);
+    })
   }
 
   minimize() {
@@ -118,3 +124,9 @@ export default class ChatHeader extends React.Component {
     )
   }
 }
+
+function mapStateToProps(state) {
+  return { channel: state.rbfcu.channel }
+}
+
+export default connect(mapStateToProps)(ChatHeader);

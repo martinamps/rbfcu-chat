@@ -5,6 +5,7 @@ import RBFCUReducer from './store/reducers/RBFCUReducer';
 import ChatBadges from './ChatBadges';
 import ChatHeader from './ChatHeader';
 import FindAgent from './FindAgent';
+import ShowSpinner from './Spinner';
 
 class App extends React.Component {
 
@@ -81,6 +82,12 @@ class App extends React.Component {
                 listeners: false
               }
             });
+            manager.store.dispatch({
+              type: 'SET_RBFCU_SHOW_SPINNER',
+              payload: {
+                showSpinner: false
+              }
+            });
             var event = new Event('flexChatEngagementEnded');
             window.dispatchEvent(event);
             return original(payload);
@@ -126,6 +133,10 @@ class App extends React.Component {
 
         // We got clever and replaced the welcome message with our own Finding Agent Spinner
         FlexWebChat.MessageList.WelcomeMessage.Content.replace(<FindAgent key="FindAgent"></FindAgent>, {
+          sortOrder: 1
+        })
+
+        FlexWebChat.MainContainer.Content.add(<ShowSpinner key="ShowSpinner"></ShowSpinner>, {
           sortOrder: 1
         })
 
