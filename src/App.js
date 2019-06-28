@@ -64,25 +64,27 @@ class App extends React.Component {
           })
         });
 
-        FlexWebChat.Actions.on("beforeRestartEngagement", (payload) => {
+        FlexWebChat.Actions.replaceAction("RestartEngagement", (payload, original) => {
           window.hideFlex();
           let currentState = manager.store.getState().flex;
           let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
-          cachedChannel.source.sendMessage('Left Chat!');
-          manager.store.dispatch({
-            type: 'SET_RBFCU_AGENT_JOINED',
-            payload: {
-              agentJoined: false
-            }
+          cachedChannel.source.sendMessage('Left Chat!').then((index) => {
+            manager.store.dispatch({
+              type: 'SET_RBFCU_AGENT_JOINED',
+              payload: {
+                agentJoined: false
+              }
+            });
+            manager.store.dispatch({
+              type: 'SET_RBFCU_CHANNEL_LISTENERS',
+              payload: {
+                listeners: false
+              }
+            });
+            var event = new Event('flexChatEngagementEnded');
+            window.dispatchEvent(event);
+            return original(payload);
           });
-          manager.store.dispatch({
-            type: 'SET_RBFCU_CHANNEL_LISTENERS',
-            payload: {
-              listeners: false
-            }
-          });
-          var event = new Event('flexChatEngagementEnded');
-          window.dispatchEvent(event);
         })
 
         FlexWebChat.Actions.on('afterToggleChatVisibility', () => {
