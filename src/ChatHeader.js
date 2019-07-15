@@ -84,6 +84,8 @@ class ChatHeader extends React.Component {
         }
       });
     }).catch((e) => {
+      var event = new Event('flexChatEngagementAbandoned');
+      window.dispatchEvent(event);
       window.hideFlex();
       this.props.channel.sendMessage('Customer Left Chat Before Agent Joined!').then((index) => {
         FlexWebChat.Actions.invokeAction('RestartEngagement');
