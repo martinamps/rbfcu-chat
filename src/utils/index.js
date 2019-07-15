@@ -5,7 +5,7 @@ export default {
     const { attributes } = channel;
 
     if (!attributes.taskSid && !attributes.runTimeDomain) {
-      throw Error('Could not end chat because the task Sid is not in the channel attributes.');
+      return Promise.reject('Not enough information to wrap the task automatically!');
     }
 
     return new Promise((resolve, reject) => {

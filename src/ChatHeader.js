@@ -84,13 +84,16 @@ class ChatHeader extends React.Component {
         }
       });
     }).catch((e) => {
-      this.props.manager.store.dispatch({
-        type: 'SET_RBFCU_SHOW_SPINNER',
-        payload: {
-          showSpinner: false
-        }
-      });
-      console.error(e);
+      window.hideFlex();
+      this.props.channel.sendMessage('Customer Left Chat Before Agent Joined!').then((index) => {
+        FlexWebChat.Actions.invokeAction('RestartEngagement');
+        this.props.manager.store.dispatch({
+          type: 'SET_RBFCU_SHOW_SPINNER',
+          payload: {
+            showSpinner: false
+          }
+        });
+      })
     })
   }
 
