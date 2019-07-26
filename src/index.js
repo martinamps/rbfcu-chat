@@ -166,25 +166,56 @@ window.toggleFlexWebchat = function()  {
   FlexWebChat.Actions.invokeAction('ToggleChatVisibility');
 }
 
+window.waitForChannel = function() {
+  return new Promise((resolve, reject) => {
+    let maxTries = 50;
+    let interval = setInterval(() => {
+      let channel = window.Twilio.FlexWebChat.manager.store.getState().flex.chat.channels;
+      let locatedChannel = channel[Object.keys(channel)[0]];
+      if (undefined !== locatedChannel) {
+        clearInterval(interval);
+        resolve(locatedChannel.source);
+      }
+      maxTries--;
+      if (maxTries < 0) {
+        clearInterval(interval);
+        reject('Could not initialize the chat.');
+      }
+    }, 250)
+  })
+}
+
 window.restartEngagement = function() {
   checkLoaded();
-  const { token } = window.Twilio.FlexWebChat.manager.store.getState().flex.session.tokenPayload;
-  const { channel } = window.Twilio.FlexWebChat.manager.store.getState().rbfcu;
+
   window.Twilio.FlexWebChat.manager.store.dispatch({
     type: 'SET_RBFCU_SHOW_SPINNER',
     payload: {
       showSpinner: true
     }
   });
-  Utils.pushTaskToWrapping(token, channel).then(() => {
-    window.hideFlex();
-    FlexWebChat.Actions.invokeAction('RestartEngagement');
-    window.Twilio.FlexWebChat.manager.store.dispatch({
-      type: 'SET_RBFCU_SHOW_SPINNER',
-      payload: {
-        showSpinner: false
-      }
-    });
+
+  window.waitForChannel()
+  .then((channel) => {
+    const { token } = window.Twilio.FlexWebChat.manager.store.getState().flex.session.tokenPayload;
+    Utils.pushTaskToWrapping(token, channel).then(() => {
+      window.hideFlex();
+      FlexWebChat.Actions.invokeAction('RestartEngagement');
+      window.Twilio.FlexWebChat.manager.store.dispatch({
+        type: 'SET_RBFCU_SHOW_SPINNER',
+        payload: {
+          showSpinner: false
+        }
+      });
+    }).catch((e) => {
+      console.error(e);
+      window.Twilio.FlexWebChat.manager.store.dispatch({
+        type: 'SET_RBFCU_SHOW_SPINNER',
+        payload: {
+          showSpinner: false
+        }
+      });
+    })
   }).catch((e) => {
     console.error(e);
     window.Twilio.FlexWebChat.manager.store.dispatch({
