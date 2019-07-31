@@ -74,29 +74,21 @@ class ChatHeader extends React.Component {
       }
     });
 
-    Utils.pushTaskToWrapping(token, this.props.channel).then(() => {
-      window.hideFlex();
-      FlexWebChat.Actions.invokeAction('RestartEngagement');
-      this.props.manager.store.dispatch({
-        type: 'SET_RBFCU_SHOW_SPINNER',
-        payload: {
-          showSpinner: false
-        }
-      });
-    }).catch((e) => {
+    // check channel for number of members
+    if (this.props.channel.members.size === 1) {
+      // the member was the only person in the channel
+      // this means its likely an abandon
       var event = new Event('flexChatEngagementAbandoned');
       window.dispatchEvent(event);
-      window.hideFlex();
-      this.props.channel.sendMessage('Customer Left Chat Before Agent Joined!').then((index) => {
-        FlexWebChat.Actions.invokeAction('RestartEngagement');
-        this.props.manager.store.dispatch({
-          type: 'SET_RBFCU_SHOW_SPINNER',
-          payload: {
-            showSpinner: false
-          }
-        });
-      })
-    })
+    } else {
+      // there were two people in the channel
+      // the agent answered the chat - the member just wants to end it
+      var event = new CustomEvent('flexChatEngagementWrapTask', { detail: { channelSid: this.props.channel.sid }});
+      window.dispatchEvent(event);
+    }
+
+    window.hideFlex();
+    FlexWebChat.Actions.invokeAction('RestartEngagement');
   }
 
   minimize() {
