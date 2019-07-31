@@ -78,14 +78,15 @@ class ChatHeader extends React.Component {
     if (this.props.channel.members.size === 1) {
       // the member was the only person in the channel
       // this means its likely an abandon
-      var event = new Event('flexChatEngagementAbandoned');
-      window.dispatchEvent(event);
+      var eventName = 'flexChatEngagementAbandoned';
     } else {
       // there were two people in the channel
       // the agent answered the chat - the member just wants to end it
-      var event = new CustomEvent('flexChatEngagementWrapTask', { detail: { channelSid: this.props.channel.sid }});
-      window.dispatchEvent(event);
+      var eventName = 'flexChatEngagementWrapTask';
     }
+
+    var event = new CustomEvent(eventName, { detail: { channelSid: this.props.channel.sid }});
+      window.dispatchEvent(event);
 
     window.hideFlex();
     FlexWebChat.Actions.invokeAction('RestartEngagement');
