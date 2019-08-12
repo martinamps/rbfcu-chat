@@ -22,6 +22,11 @@ class App extends React.Component {
 
     // Workaround fix due in 2.0.1
     FlexWebChat.EntryPoint.defaultProps.tagline = configuration.componentProps.EntryPoint.tagline;
+
+    // Alter the predefined Message
+    FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage.body = 'Hey, I\'m Randy, a chatbot for RBFCU. How can I help you today?';
+    FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage.authorName = 'Randy';
+
     FlexWebChat.Manager.create(configuration)
       .then(manager => {
 
@@ -113,9 +118,6 @@ class App extends React.Component {
 
         // remove FlexWebChat Canvas Tray (displayed when channel goes inactive)
         FlexWebChat.MessagingCanvas.Content.remove('tray');
-
-        // remove default predefned message
-        FlexWebChat.MessagingCanvas.defaultProps.predefinedMessage = false;
 
         // replace the default chat header
         FlexWebChat.MainHeader.Content.replace(
