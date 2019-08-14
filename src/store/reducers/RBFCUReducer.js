@@ -12,7 +12,7 @@ const initialState = {
   listeners: false,
   channel: null,
   unreadCount: 0,
-  agentJoined: false,
+  showFindingAgent: false,
   showSpinner: false
 };
 
@@ -28,15 +28,10 @@ const RBFCUReducer = (state = initialState, action) => {
         ...state,
         channel: action.payload.channel
       };
-    case 'SET_RBFCU_UNREAD_COUNT':
+    case 'SET_RBFCU_FINDING_AGENT':
       return {
         ...state,
-        unreadCount: action.payload.unreadCount
-      };
-    case 'SET_RBFCU_AGENT_JOINED':
-      return {
-        ...state,
-        agentJoined: action.payload.agentJoined
+        showFindingAgent: action.payload.showFindingAgent
       };
     case 'SET_RBFCU_SHOW_SPINNER':
       return {

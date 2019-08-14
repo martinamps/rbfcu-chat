@@ -75,9 +75,9 @@ class App extends React.Component {
           let currentState = manager.store.getState().flex;
           let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
           manager.store.dispatch({
-            type: 'SET_RBFCU_AGENT_JOINED',
+            type: 'SET_RBFCU_FINDING_AGENT',
             payload: {
-              agentJoined: false
+              showFindingAgent: false
             }
           });
           manager.store.dispatch({
@@ -184,21 +184,14 @@ class App extends React.Component {
 
     this.getChannel().then((cachedChannel) => {
 
-      if (cachedChannel.members.size > 1) {
-        this.state.manager.store.dispatch({
-          type: 'SET_RBFCU_AGENT_JOINED',
-          payload: {
-            agentJoined: true
-          }
-        });
-      } else {
-        this.state.manager.store.dispatch({
-          type: 'SET_RBFCU_AGENT_JOINED',
-          payload: {
-            agentJoined: false
-          }
-        });
-      }
+      // if (cachedChannel.members.size < 2 && cachedChannel.attributes.escalated) {
+      //   this.state.manager.store.dispatch({
+      //     type: 'SET_RBFCU_FINDING_AGENT',
+      //     payload: {
+      //       showFindingAgent: true
+      //     }
+      //   });
+      // }
 
       cachedChannel.on('messageAdded', (message) => {
         var event = new Event('flexMessageSentToChannel');
@@ -232,21 +225,25 @@ class App extends React.Component {
         ) {
           window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
         }
+        if (channel.members.size < 2 && channel.attributes.escalated) {
+          console.log('show finding agent because of updated event');
+          this.state.manager.store.dispatch({
+            type: 'SET_RBFCU_FINDING_AGENT',
+            payload: {
+              showFindingAgent: true
+            }
+          });
+        }
+
       });
 
       cachedChannel.on('memberJoined', (member) => {
-        if (cachedChannel.members.size > 1) {
+        if (cachedChannel.members.size > 1 && cachedChannel.attributes.escalated) {
+          console.log('hiding finding agent because member joined');
           this.state.manager.store.dispatch({
-            type: 'SET_RBFCU_AGENT_JOINED',
+            type: 'SET_RBFCU_FINDING_AGENT',
             payload: {
-              agentJoined: true
-            }
-          });
-        } else {
-          this.state.manager.store.dispatch({
-            type: 'SET_RBFCU_AGENT_JOINED',
-            payload: {
-              agentJoined: false
+              showFindingAgent: false
             }
           });
         }

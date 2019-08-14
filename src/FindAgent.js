@@ -14,7 +14,7 @@ class FindAgent extends React.Component {
 
   render() {
     return (
-      this.props.agentJoined ? null :
+      this.props.showFindingAgent ?
         <div style={ center }>
           <FlexWebChat.CircularProgress
               size={80}
@@ -23,13 +23,13 @@ class FindAgent extends React.Component {
               className="Twilio-PendingEngagementProgress"
           />
           <p>Finding you the perfect agent.</p>
-        </div>
+        </div> : null
     )
   }
 }
 
 function mapStateToProps(state) {
-  return { agentJoined: state.rbfcu.agentJoined }
+  return { showFindingAgent: state.rbfcu.showFindingAgent }
 }
 
 export default connect(mapStateToProps)(FindAgent);

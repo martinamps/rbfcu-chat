@@ -86,7 +86,7 @@ class ChatHeader extends React.Component {
     }
 
     var event = new CustomEvent(eventName, { detail: { channelSid: this.props.channel.sid }});
-      window.dispatchEvent(event);
+    window.dispatchEvent(event);
 
     window.hideFlex();
     FlexWebChat.Actions.invokeAction('RestartEngagement');
