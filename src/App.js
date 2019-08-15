@@ -66,6 +66,8 @@ class App extends React.Component {
                 const { question } = payload.formData;
                 if (!question) return;
                 channel.sendMessage(question);
+                var event = new Event('flexAutopilotSessionStarted');
+                window.dispatchEvent(event);
             });
           })
         });
@@ -184,15 +186,6 @@ class App extends React.Component {
 
     this.getChannel().then((cachedChannel) => {
 
-      // if (cachedChannel.members.size < 2 && cachedChannel.attributes.escalated) {
-      //   this.state.manager.store.dispatch({
-      //     type: 'SET_RBFCU_FINDING_AGENT',
-      //     payload: {
-      //       showFindingAgent: true
-      //     }
-      //   });
-      // }
-
       cachedChannel.on('messageAdded', (message) => {
         var event = new Event('flexMessageSentToChannel');
         window.dispatchEvent(event);
@@ -226,7 +219,8 @@ class App extends React.Component {
           window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
         }
         if (channel.members.size < 2 && channel.attributes.escalated) {
-          console.log('show finding agent because of updated event');
+          var event = new Event('flexAutopilotSessionEnded');
+          window.dispatchEvent(event);
           this.state.manager.store.dispatch({
             type: 'SET_RBFCU_FINDING_AGENT',
             payload: {
@@ -239,7 +233,8 @@ class App extends React.Component {
 
       cachedChannel.on('memberJoined', (member) => {
         if (cachedChannel.members.size > 1 && cachedChannel.attributes.escalated) {
-          console.log('hiding finding agent because member joined');
+          var event = new Event('flexAgentJoinedChat');
+          window.dispatchEvent(event);
           this.state.manager.store.dispatch({
             type: 'SET_RBFCU_FINDING_AGENT',
             payload: {
