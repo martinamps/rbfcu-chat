@@ -133,8 +133,11 @@ class App extends React.Component {
           { sortOrder: 1 }
         );
 
-        // We got clever and replaced the welcome message with our own Finding Agent Spinner
-        FlexWebChat.MessageList.WelcomeMessage.Content.replace(<FindAgent key="FindAgent"></FindAgent>, {
+        FlexWebChat.MessageList.WelcomeMessage.Content.remove();
+
+
+        // Finding Agent Spinner
+        FlexWebChat.MessagingCanvas.Content.add(<FindAgent key="FindAgent"></FindAgent>, {
           sortOrder: 1
         })
 

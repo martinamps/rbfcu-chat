@@ -87,7 +87,7 @@ const appConfig = {
     MessagingCanvas: {
       showTrayOnInactive: false,
       showReadStatus: false,
-      showWelcomeMessage: true,
+      showWelcomeMessage: false,
     },
     EntryPoint: {
       tagline: "ongoing chat",

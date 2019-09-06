@@ -3,7 +3,14 @@ import { connect } from 'react-redux';
 import * as FlexWebChat from "@twilio/flex-webchat-ui";
 
 const center = {
-  textAlign: 'center'
+  textAlign: 'center',
+  position: 'absolute',
+  paddingTop: '50%',
+  top: '0px',
+  bottom: '0px',
+  left: '0px',
+  right: '0px',
+  background: 'rgba(255, 255, 255, 0.9)'
 };
 
 class FindAgent extends React.Component {
