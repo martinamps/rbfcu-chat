@@ -5,7 +5,7 @@
   "dependencies": {
     "@babel/core": "7.1.0",
     "@svgr/webpack": "2.4.1",
-    "@twilio/flex-webchat-ui": "^2.0.0",
+    "@twilio/flex-webchat-ui": "^2",
     "array-findindex-polyfill": "^0.1.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "9.0.0",
