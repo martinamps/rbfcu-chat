@@ -224,6 +224,7 @@ class App extends React.Component {
         ) {
           window.Twilio.FlexWebChat.Actions.invokeAction('RestartEngagement');
         }
+
         if (channel.members.size < 2 && channel.attributes.escalated) {
           var event = new Event('flexAutopilotSessionEnded');
           window.dispatchEvent(event);
@@ -236,27 +237,10 @@ class App extends React.Component {
         }
 
         if (undefined !== channel.attributes.showClickableMessages) {
-          let clickableMessages = [];
-          switch(channel.attributes.clickableMessages) {
-            case 'question1':
-              clickableMessages = [
-                {
-                  key: 'yes-bubble',
-                  message: 'Yes'
-                },
-                {
-                  key: 'no-bubble',
-                  message: 'No'
-                }
-              ];
-              break;
-            default:
-              clickableMessages = [];
-          }
           this.state.manager.store.dispatch({
             type: 'SET_RBFCU_SHOW_CLICKABLE_MESSAGES',
             payload: {
-              clickableMessages: clickableMessages
+              clickableMessages: channel.attributes.clickableMessages
             }
           })
         }
