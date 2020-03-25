@@ -1,5 +1,3 @@
-import * as FlexWebChat from "@twilio/flex-webchat-ui";
-
 export default {
   pushTaskToWrapping(token, channel) {
     const { attributes } = channel;

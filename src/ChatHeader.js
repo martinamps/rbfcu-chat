@@ -1,7 +1,6 @@
 import React from 'react';
 import * as FlexWebChat from "@twilio/flex-webchat-ui";
 import { connect } from 'react-redux';
-import Utils from './utils/index';
 
 const padding = {
   paddingLeft: '10px',
@@ -65,7 +64,7 @@ class ChatHeader extends React.Component {
   endChat() {
     this.hideConfirm();
 
-    const { token } = this.props.manager.store.getState().flex.session.tokenPayload;
+    var eventName = '';
 
     this.props.manager.store.dispatch({
       type: 'SET_RBFCU_SHOW_SPINNER',
@@ -78,11 +77,11 @@ class ChatHeader extends React.Component {
     if (this.props.channel.members.size === 1) {
       // the member was the only person in the channel
       // this means its likely an abandon
-      var eventName = 'flexChatEngagementAbandoned';
+      eventName = 'flexChatEngagementAbandoned';
     } else {
       // there were two people in the channel
       // the agent answered the chat - the member just wants to end it
-      var eventName = 'flexChatEngagementWrapTask';
+      eventName = 'flexChatEngagementWrapTask';
     }
 
     var event = new CustomEvent(eventName, { detail: { channelSid: this.props.channel.sid }});

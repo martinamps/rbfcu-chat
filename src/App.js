@@ -14,7 +14,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
-    const { configuration, resolve, reject } = props;
+    const { configuration, resolve } = props;
 
     this.getChannel = this.getChannel.bind(this);
     this.getChatClient = this.getChatClient.bind(this);
@@ -74,8 +74,6 @@ class App extends React.Component {
 
         FlexWebChat.Actions.replaceAction("RestartEngagement", (payload, original) => {
           window.hideFlex();
-          let currentState = manager.store.getState().flex;
-          let cachedChannel = currentState.chat.channels[Object.keys(currentState.chat.channels)[0]];
           manager.store.dispatch({
             type: 'SET_RBFCU_FINDING_AGENT',
             payload: {

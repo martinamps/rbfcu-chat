@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import * as FlexWebChat from "@twilio/flex-webchat-ui";
 
 const badgeStyles = {
   padding: '3px 8px 5px',
