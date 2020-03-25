@@ -38,6 +38,11 @@ const RBFCUReducer = (state = initialState, action) => {
         ...state,
         showSpinner: action.payload.showSpinner
       };
+    case 'SET_RBFCU_SHOW_CLICKABLE_MESSAGES':
+      return {
+        ...state,
+        clickableMessages: action.payload.clickableMessages
+      }
     default:
       return state;
   }

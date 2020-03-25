@@ -6,6 +6,7 @@ import ChatBadges from './ChatBadges';
 import ChatHeader from './ChatHeader';
 import FindAgent from './FindAgent';
 import ShowSpinner from './Spinner';
+import ClickableMessages from './ClickableMessages';
 
 class App extends React.Component {
 
@@ -143,6 +144,10 @@ class App extends React.Component {
           sortOrder: 1
         })
 
+        FlexWebChat.MessageInput.Content.add(<ClickableMessages key="ClickableMessages" />, {
+          sortOrder: -1
+        });
+
       }).catch(error => this.setState({ error }));
   }
 
@@ -230,6 +235,31 @@ class App extends React.Component {
           });
         }
 
+        if (undefined !== channel.attributes.showClickableMessages) {
+          let clickableMessages = [];
+          switch(channel.attributes.clickableMessages) {
+            case 'question1':
+              clickableMessages = [
+                {
+                  key: 'yes-bubble',
+                  message: 'Yes'
+                },
+                {
+                  key: 'no-bubble',
+                  message: 'No'
+                }
+              ];
+              break;
+            default:
+              clickableMessages = [];
+          }
+          this.state.manager.store.dispatch({
+            type: 'SET_RBFCU_SHOW_CLICKABLE_MESSAGES',
+            payload: {
+              clickableMessages: clickableMessages
+            }
+          })
+        }
       });
 
       cachedChannel.on('memberJoined', (member) => {
