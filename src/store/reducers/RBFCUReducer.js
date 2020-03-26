@@ -13,7 +13,8 @@ const initialState = {
   channel: null,
   unreadCount: 0,
   showFindingAgent: false,
-  showSpinner: false
+  showSpinner: false,
+  clickableMessages: []
 };
 
 const RBFCUReducer = (state = initialState, action) => {
