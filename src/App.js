@@ -236,7 +236,7 @@ class App extends React.Component {
           });
         }
 
-        if (undefined !== channel.attributes.clickableMessages) {
+        if (undefined !== channel.attributes.clickableMessages && (updateReasons.indexOf('attributes') !== -1)) {
           this.state.manager.store.dispatch({
             type: 'SET_RBFCU_SHOW_CLICKABLE_MESSAGES',
             payload: {
