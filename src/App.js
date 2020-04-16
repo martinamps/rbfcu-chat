@@ -20,6 +20,7 @@ class App extends React.Component {
     this.getChannel = this.getChannel.bind(this);
     this.getChatClient = this.getChatClient.bind(this);
     this.setUpChannelListeners = this.setUpChannelListeners.bind(this);
+    this.scrollView = this.scrollView.bind(this);
 
     // Workaround fix due in 2.0.1
     FlexWebChat.EntryPoint.defaultProps.tagline = configuration.componentProps.EntryPoint.tagline;
@@ -185,6 +186,10 @@ class App extends React.Component {
     })
   }
 
+  scrollView() {
+    document.getElementsByClassName('Twilio-MessageList')[0].scrollTop = document.getElementsByClassName('Twilio-MessageList')[0].scrollHeight
+  }
+
   setUpChannelListeners() {
     if (this.state.setUpChannelListeners) {
       return;
@@ -243,6 +248,7 @@ class App extends React.Component {
               clickableMessages: channel.attributes.clickableMessages
             }
           })
+          this.scrollView();
         }
       });
 
